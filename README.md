@@ -26,13 +26,6 @@ For OmniFetch to process complex websites and merge audio/video streams, you mus
 1. **yt-dlp.exe:** [Download the latest release here](https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe)
 2. **ffmpeg.exe:** [Download the essential build here](https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z) *(Extract the `.7z` file, open the `bin` folder, and copy `ffmpeg.exe` to your OmniFetch folder).*
 
-**Your folder structure should look exactly like this:**
-
-📂 OmniFetch/
- ├── 📜 OmniFetch_CLI.ps1
- ├── ⚙️ yt-dlp.exe
- └── ⚙️ ffmpeg.exe
-
 🚀 Usage
 Right-click OmniFetch_CLI.ps1 and select Run with PowerShell.
 (Note: If scripts are disabled on your system, open PowerShell as Admin and run Set-ExecutionPolicy RemoteSigned -Scope CurrentUser).
@@ -54,8 +47,8 @@ Open the video page in your browser.
 * Paste that link into OmniFetch and select Mode 2.
 
 📝 Supported File Types (Direct Mode)
-Videos: .mp4, .webm, .mkv, .mov, .avi
-Images: .jpg, .png, .gif, .webp, .svg
-Audio: .mp3, .wav, .ogg, .aac, .flac
-Docs/Arch: .pdf, .zip, .rar, .txt
+* Videos: .mp4, .webm, .mkv, .mov, .avi
+* Images: .jpg, .png, .gif, .webp, .svg
+* Audio: .mp3, .wav, .ogg, .aac, .flac
+* Docs/Arch: .pdf, .zip, .rar, .txt
 (Mode 2 supports virtually any video format provided by the host website).
