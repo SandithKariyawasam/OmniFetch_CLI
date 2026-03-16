@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    OmniFetch_CLI v1.3 - Continuous Loop Edition
+    OmniFetch CLI v1.4 - Continuous Loop & Advanced Decoders
 #>
 
 # --- CONFIGURATION (Runs once at startup) ---
@@ -40,7 +40,7 @@ function Get-ExtensionFromMime {
 do {
     Clear-Host
     Write-Host "==========================================" -ForegroundColor Cyan
-    Write-Host "   OmniFetch_CLI v1.3 (Continuous)        " -ForegroundColor White
+    Write-Host "   OmniFetch CLI v1.4                     " -ForegroundColor White
     Write-Host "==========================================" -ForegroundColor Cyan
     Write-Host "   Type 'exit' to close the program       " -ForegroundColor DarkGray
     Write-Host "==========================================" -ForegroundColor Cyan
@@ -51,11 +51,22 @@ do {
     if ([string]::IsNullOrWhiteSpace($Url)) { continue }
     if ($Url.ToLower() -eq "exit") { break }
 
+    # --- NEW FEATURE: JWPLAYER PING DECODER ---
+    # Looks for "&mu=" or "?mu=" inside the URL and extracts the encoded link
+    if ($Url -match "(?:&|\?)mu=([^&]+)") {
+        $EncodedUrl = $matches[1]
+        Write-Host "`n[!] Analytics Ping Detected! Extracting hidden stream..." -ForegroundColor Yellow
+        # Decode the URL (converts %3A to ':', %2F to '/', etc.)
+        $Url = [uri]::UnescapeDataString($EncodedUrl)
+        Write-Host "    Decoded Target: $Url" -ForegroundColor Green
+    }
+
     # 2. Smart Mode Selection
     Write-Host "`n[?] Select Download Mode:" -ForegroundColor Yellow
     Write-Host "    [1] Direct File  (For .zip, .exe, .mp4 links)" -ForegroundColor Gray
     Write-Host "    [2] Web Video    (For YouTube, Streaming, Hidden m3u8)" -ForegroundColor Gray
 
+    # Auto-detect suggestion
     $DefaultMode = "2"
     if ($Url -match "\.(zip|rar|exe|iso|pdf|jpg|png)$") { $DefaultMode = "1" }
 
@@ -77,7 +88,8 @@ do {
         }
 
         # --- AUTO-SNIFFER ---
-        if ($Url -notmatch "\.m3u8$") {
+        # Skip sniffer if we already decoded a direct m3u8 link from the ping
+        if ($Url -notmatch "\.m3u8" -and $Url -notmatch "\.mpd") {
             Write-Host "Scanning page for hidden streams..." -ForegroundColor Yellow
             try {
                 $WebReq = [System.Net.HttpWebRequest]::Create($Url)
@@ -162,14 +174,14 @@ do {
                         $FilePath = Join-Path $DownloadFolder $FileName
                         $PartFilePath = "$FilePath.part"
                     }
-                    default { continue } # Go back to start of loop
+                    default { continue } 
                 }
             }
 
             if ($TotalSize -gt 0 -and $StartByte -ge $TotalSize) {
                 Write-Host "Download already complete." -ForegroundColor Green
                 Move-Item $PartFilePath $FilePath -Force -ErrorAction SilentlyContinue
-                continue # Go back to start
+                continue 
             }
 
             Write-Host "`n[2/3] Downloading..." -ForegroundColor Yellow
@@ -214,9 +226,8 @@ do {
         }
     }
 
-    # Pause briefly before clearing screen for the next job
     Write-Host "`n------------------------------------------" -ForegroundColor DarkGray
     Write-Host "Ready for next download..." -ForegroundColor Gray
     Start-Sleep -Seconds 2
 
-} while ($true) # Loop forever until 'break' is called
+} while ($true)
